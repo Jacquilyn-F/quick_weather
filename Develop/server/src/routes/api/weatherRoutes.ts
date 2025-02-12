@@ -3,6 +3,7 @@ const router = Router();
 
 import HistoryService from '../../service/historyService.js';
 import WeatherService from '../../service/weatherService.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // POST Request with city name to retrieve weather data
 router.post('/', async (req: Request, res: Response) => {
@@ -14,7 +15,8 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     console.log(`Fetching weather data for city: ${cityName}`);
     const weatherData = await WeatherService.getWeatherForCity(cityName);
-    await HistoryService.addCity(cityName);
+    const city = { name: cityName, id: uuidv4() }; // Create a City object with a unique ID
+    await HistoryService.addCity(city); // Pass the City object
     return res.json(weatherData);
   } catch (error) {
     if (error instanceof Error) {
