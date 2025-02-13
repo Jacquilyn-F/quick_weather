@@ -61,7 +61,7 @@ class WeatherService {
       currentWeather.dt_txt,
       currentWeather.weather[0].icon,
       currentWeather.weather[0].description,
-      currentWeather.main.temp,
+      currentWeather.main.tempF,
       currentWeather.wind.speed,
       currentWeather.main.humidity
     );
@@ -69,18 +69,21 @@ class WeatherService {
 
   // TODO: Complete buildForecastArray method
   private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
-    return weatherData.map((data: any) => {
-      return new Weather(
-        currentWeather.city,
-        data.dt_txt,
-        data.weather[0].icon,
-        data.weather[0].description,
-        data.main.temp,
-        data.wind.speed,
-        data.main.humidity
-      );
-    });
+    return weatherData
+      .filter((weather: any) => weather.dt_txt.includes('12:00:00'))
+      .map((weather: any) => {
+        return new Weather(
+          currentWeather.city,
+          weather.dt_txt,
+          weather.weather[0].icon,
+          weather.weather[0].description,
+          weather.main.tempF,
+          weather.wind.speed,
+          weather.main.humidity
+        );
+      });
   }
+
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string): Promise<Weather[]> {
     const coordinates = await this.fetchAndDestructureLocationData(city);
