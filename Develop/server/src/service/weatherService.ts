@@ -56,12 +56,13 @@ class WeatherService {
   private parseCurrentWeather(response: any): Weather {
     const { city, list } = response;
     const currentWeather = list[0];
+    const tempF = this.convertKelvinToFahrenheit(currentWeather.main.temp);
     return new Weather(
       city.name,
       currentWeather.dt_txt,
       currentWeather.weather[0].icon,
       currentWeather.weather[0].description,
-      currentWeather.main.tempF,
+      tempF,
       currentWeather.wind.speed,
       currentWeather.main.humidity
     );
@@ -69,19 +70,28 @@ class WeatherService {
 
   // TODO: Complete buildForecastArray method
   private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
-    return weatherData
-      .filter((weather: any) => weather.dt_txt.includes('12:00:00'))
-      .map((weather: any) => {
-        return new Weather(
-          currentWeather.city,
-          weather.dt_txt,
-          weather.weather[0].icon,
-          weather.weather[0].description,
-          weather.main.tempF,
-          weather.wind.speed,
-          weather.main.humidity
-        );
-      });
+    const dailyData = weatherData.filter((data: any, index: number, array: any[]) => {
+      const date = new Date(data.dt_txt).getDate();
+      const nextDate = index + 1 < array.length ? new Date(array[index + 1].dt_txt).getDate() : null;
+      return date !== nextDate;
+    });
+
+    return dailyData.slice(0, 5).map((data: any) => {
+      const tempF = this.convertKelvinToFahrenheit(data.main.temp);
+      return new Weather(
+        currentWeather.city,
+        data.dt_txt,
+        data.weather[0].icon,
+        data.weather[0].description,
+        tempF,
+        data.wind.speed,
+        data.main.humidity
+      );
+    });
+  }
+
+  private convertKelvinToFahrenheit(tempK: number): number {
+    return (tempK - 273.15) * 9/5 + 32;
   }
 
   // TODO: Complete getWeatherForCity method
