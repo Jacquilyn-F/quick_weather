@@ -14,5 +14,10 @@
   },
   "dependencies": {
     "dayjs": "^1.11.10"
-  }
+  },
+  "main": "vite.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
